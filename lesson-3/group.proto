@@ -1,13 +1,10 @@
 syntax = "proto3";
 
-package user;
+package group;
 
-option go_package="./";
+option go_package="/group";
 
-message User {
-    string user_id = 1;
-    string email = 2;
-}
+import "user.proto";
 
 enum Category {
     DEVELOPER = 0;
@@ -18,5 +15,5 @@ message Group {
     int32 id = 1;
     Category category = 2;
     float score = 3;
-    repeated User users = 4;
+    repeated user.User users = 4;
 }

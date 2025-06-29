@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	"github.com/mintesnotAfework/protocol-buffer/group"
 	"github.com/mintesnotAfework/protocol-buffer/user"
 	"google.golang.org/protobuf/proto"
 )
@@ -17,11 +18,11 @@ func main() {
 		Email:  "hola@world.com",
 	}
 
-	g := user.Group{
+	g := group.Group{
 		Id:       1,
 		Score:    3.2,
 		Users:    []*user.User{&u1, &u2},
-		Category: user.Category_DEVELOPER,
+		Category: group.Category_DEVELOPER,
 	}
 
 	fmt.Println(g.String())
@@ -31,7 +32,7 @@ func main() {
 		panic("can not marshal")
 	}
 
-	v := user.Group{}
+	v := group.Group{}
 	err = proto.Unmarshal(encoded, &v)
 	if err != nil {
 		panic("can not unmarshal")
