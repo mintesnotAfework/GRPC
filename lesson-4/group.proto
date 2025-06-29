@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package group;
+
+option go_package="/group";
+
+enum Category {
+    DEVELOPER = 0;
+    OPERATOR = 1;
+}
+
+message Group {
+    int32 id = 1;
+    Category category = 2;
+    float score = 3;
+    message User {
+        string user_id = 1;
+        string email = 2;
+    }
+    repeated User user = 4;
+}
+
+message Winner {
+    Group.User user = 1;
+    Category category = 2;
+}
