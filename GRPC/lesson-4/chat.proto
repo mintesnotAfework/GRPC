@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package chat;
+
+option go_package = "github.com/mintesnotAfework/GRPC/GRPC";
+
+message ChatRequest {
+    int64 id = 1;
+    int64 to = 2;
+    string txt = 3;
+}
+
+message StatsResponse {
+    int64 total_char = 1;
+}
+
+service ChatService {
+    rpc SendTxt (stream ChatRequest) returns (stream StatsResponse);
+}
