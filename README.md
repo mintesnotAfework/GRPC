@@ -1,3 +1,4 @@
+```mermaid
 graph TD
     %% Define the Cloud/Internet
     subgraph CLOUD ["Public Cloud / Internet"]
@@ -113,3 +114,4 @@ graph TD
     %% Assigning styles to nodes
     %% NGINX_RP has a public IF (1.2.3.4) and a private IF (192.168.0.2)
     %% In this visualization, NGINX_RP is the main box.
+```
