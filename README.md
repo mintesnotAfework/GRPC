@@ -1,46 +1,52 @@
 ```mermaid
 graph TD
-    %% SUB-NET 0: PUBLIC
-    subgraph PUBLIC_NET ["PUBLIC SUBNET (192.168.0.0/24)"]
-        direction TB
-        NGINX_RP["Nginx Reverse Proxy <br/> (1.2.3.4 / 192.168.0.2)"]
-        FRONTEND_PUB["Public Frontend <br/> (192.168.0.4)"]
-        BACKEND_PUB["Public Backend <br/> (192.168.0.3)"]
-        
-        NGINX_RP --- FRONTEND_PUB
-        NGINX_RP --- BACKEND_PUB
+    %% Internet Representation
+    Cloud((Cloud / Internet))
+
+    %% 192.168.0.0/24 - PUBLIC FACING SUBNET
+    subgraph Subnet_0 [Public Subnet: 192.168.0.0/24]
+        Nginx_Pub["Nginx Reverse Proxy<br/>.2 (Internal) | 1.2.3.4 (Cloud)"]
+        Frontend_Pub["Public Frontend<br/>.4"]
+        Backend_Pub_A["Public Backend (Int A)<br/>.3"]
     end
 
-    %% SUB-NET 1: PRIVATE
-    subgraph PRIVATE_NET ["PRIVATE SUBNET (192.168.1.0/24)"]
-        direction TB
-        NGINX_INT["Nginx Internal <br/> (192.168.1.7)"]
-        BACKEND_PRI["Private Backend <br/> (192.168.1.4)"]
-        CMS_PORTAL["CMS Portal <br/> (192.168.1.5)"]
-        PREVIEW_PORTAL["Preview Portal <br/> (192.168.1.6)"]
-        POSTGRES_DB[("Postgres DB <br/> (192.168.1.3)")]
-        MINIO_S3["MinIO Storage <br/> (192.168.1.4)"]
-        
-        NGINX_INT --- BACKEND_PRI
-        NGINX_INT --- CMS_PORTAL
-        NGINX_INT --- PREVIEW_PORTAL
-        NGINX_INT --- POSTGRES_DB
-        NGINX_INT --- MINIO_S3
+    %% 192.168.1.0/24 - PRIVATE BACKEND SUBNET
+    subgraph Subnet_1 [Private Subnet: 192.168.1.0/24]
+        Backend_Pub_B["Public Backend (Int B)<br/>.2"]
+        Nginx_Priv["Private Nginx<br/>.7"]
+        Postgres[("Postgres DB<br/>.3")]
+        Minio["Minio Storage<br/>.4"]
+        Backend_Priv["Private Backend<br/>.4"]
+        CMS["CMS Portal<br/>.5"]
+        Preview["Preview Portal<br/>.6"]
     end
 
-    %% SUB-NET 2: VPN
-    subgraph VPN_NET ["VPN SUBNET (192.168.2.0/24)"]
-        direction LR
-        NGINX_VPN_IF["Nginx VPN IF <br/> (192.168.2.2)"]
-        VPN_GATEWAY["VPN Server <br/> (1.2.3.5 / 192.168.2.3)"]
-        
-        NGINX_VPN_IF --- VPN_GATEWAY
+    %% 192.168.2.0/24 - VPN SUBNET
+    subgraph Subnet_2 [VPN Subnet: 192.168.2.0/24]
+        Nginx_VPN["Nginx VPN IF<br/>.2"]
+        VPN_Srv["VPN Server<br/>.3 (Internal) | 1.2.3.5 (Cloud)"]
     end
 
-    %% INTER-SUBNET CONNECTIONS
-    %% Connects the Public Backend to the Private Subnet
-    BACKEND_PUB --- NGINX_INT
-    
-    %% Connects the Main Nginx to the VPN Subnet
-    NGINX_RP --- NGINX_VPN_IF
+    %% Cloud Connections
+    Cloud <--> Nginx_Pub
+    Cloud <--> VPN_Srv
+
+    %% Subnet 0 Internal Connections
+    Nginx_Pub --- Frontend_Pub
+    Nginx_Pub --- Backend_Pub_A
+
+    %% Bridge between Subnet 0 and Subnet 1 via Public Backend
+    Backend_Pub_A --- Backend_Pub_B
+
+    %% Subnet 1 Internal Connections
+    Backend_Pub_B --- Nginx_Priv
+    Nginx_Priv --- Postgres
+    Nginx_Priv --- Minio
+    Nginx_Priv --- Backend_Priv
+    Nginx_Priv --- CMS
+    Nginx_Priv --- Preview
+
+    %% Bridge between Subnet 0 and Subnet 2 via Nginx Proxy
+    Nginx_Pub --- Nginx_VPN
+    Nginx_VPN --- VPN_Srv
 ```
